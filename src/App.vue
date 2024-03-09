@@ -1,15 +1,23 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref } from 'vue'
+import HeaderBar from './components/HeaderBar.vue'
+import SideBar from './components/SideBar.vue'
+import NineSquare from './components/NineSquare.vue';
+
+const isSideBarOpen = ref(false)
+
+const toggleSideBar = (params = null) => {
+  if (params) isSideBarOpen.value = params
+  else isSideBarOpen.value = !isSideBarOpen.value
+}
 </script>
 
 <template>
-  <div class="container">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo border-8 border-indigo-600" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="relative flex flex-col overflow-hidden w-screen h-screen bg-gray-300">
+    <HeaderBar @toggleSideBar="toggleSideBar" />
+    <div class="w-full h-full grid place-items-center overflow-y-scroll">
+      <NineSquare />
+    </div>
+    <SideBar :isSideBarOpen="isSideBarOpen" @toggleSideBar="toggleSideBar" />
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
