@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import DropdownMenu from './DropdownMenu.vue'
+import DropdownSelect from './DropdownSelect.vue'
 import drinkMenu from '../mock/drinkMenu.js'
 
 defineProps({
@@ -15,11 +16,12 @@ const toggleSideBar = (params) => {
   emit('toggleSideBar', params)
 }
 
-const handleList = (list, level = 0) => {
+const drinkMenuList = JSON.parse(JSON.stringify(drinkMenu));
+const handleMenuList = (list, level = 0) => {
   for (let i = 0; i < list.length; i++) {
     list[i].level = level
     if (list[i].children?.length > 0) {
-      handleList(list[i].children, level + 1)
+      handleMenuList(list[i].children, level + 1)
     }
   }
   return list
@@ -28,20 +30,33 @@ const handleList = (list, level = 0) => {
 const preKey = ref('')
 const activeMenuList = reactive([])
 const searchActiveMenuList = reactive({ set: new Set() }) // 同 activeMenuList，搜尋用 Set.has
+
 const selectMenuItem = (params) => {
   // 避免重覆觸發
-  const hasSameClicked = params.key === preKey.value
-  if (hasSameClicked) return
-  preKey.value = params.key
+  if (hasSameClicked(params)) return
 
   const hasClickedSameLevel = activeMenuList.length === params.level + 1
   const hasClickedPreLevel = activeMenuList.length > params.level
 
   if (hasClickedSameLevel) activeMenuList.pop()
   else if (hasClickedPreLevel) activeMenuList.length = params.level
-  activeMenuList.push(params.key)
 
+  activeMenuList.push(params.key)
   searchActiveMenuList.set = new Set(activeMenuList)
+}
+
+const selectSelectItem = (params) => {
+  if (hasSameClicked(params)) return
+
+  activeMenuList.length = 0
+  activeMenuList.push(...params.allKey.split('-'))
+  searchActiveMenuList.set = new Set(activeMenuList)
+}
+
+const hasSameClicked = (params) => {
+  let sameClick = params.key === preKey.value
+  preKey.value = params.key
+  return sameClick
 }
 </script>
 
@@ -58,9 +73,13 @@ const selectMenuItem = (params) => {
     :class="{ 'translate-x-full': !isSideBarOpen }"
   >
     <DropdownMenu 
-      :drinkMenu="handleList(drinkMenu)"
+      :drinkMenu="handleMenuList(drinkMenuList)"
       :searchActiveMenuList="searchActiveMenuList"
       @selectMenuItem="selectMenuItem" 
+    />
+    <DropdownSelect
+      :drinkMenu="drinkMenu"
+      @selectSelectItem="selectSelectItem"
     />
   </div>
 </template>
