@@ -16,17 +16,6 @@ const toggleSideBar = (params) => {
   emit('toggleSideBar', params)
 }
 
-const drinkMenuList = JSON.parse(JSON.stringify(drinkMenu));
-const handleMenuList = (list, level = 0) => {
-  for (let i = 0; i < list.length; i++) {
-    list[i].level = level
-    if (list[i].children?.length > 0) {
-      handleMenuList(list[i].children, level + 1)
-    }
-  }
-  return list
-}
-
 const preKey = ref('')
 const activeMenuList = reactive([])
 const searchActiveMenuList = reactive({ set: new Set() }) // 同 activeMenuList，搜尋用 Set.has
@@ -43,6 +32,7 @@ const selectMenuItem = (params) => {
 
   activeMenuList.push(params.key)
   searchActiveMenuList.set = new Set(activeMenuList)
+  localStorage.setItem('selectedMenuKey', params.key);
 }
 
 const selectSelectItem = (params) => {
@@ -51,6 +41,7 @@ const selectSelectItem = (params) => {
   activeMenuList.length = 0
   activeMenuList.push(...params.allKey.split('-'))
   searchActiveMenuList.set = new Set(activeMenuList)
+  localStorage.setItem('selectedMenuKey', params.key);
 }
 
 const hasSameClicked = (params) => {
@@ -58,6 +49,37 @@ const hasSameClicked = (params) => {
   preKey.value = params.key
   return sameClick
 }
+
+const checkLocal = (params) => {
+  const localKey = localStorage.getItem("selectedMenuKey");
+  if (!localKey) return
+
+  const allKey = params.allKey.split('-')
+  const lastKey = allKey[allKey.length - 1] 
+  if (lastKey === localKey) {
+    selectSelectItem(params)
+  }
+}
+
+const drinkMenuCopy = JSON.parse(JSON.stringify(drinkMenu));
+let drinkMenuList = reactive([])
+
+// 對 Menu 資料做初始處理
+const handleMenuList = (list, level = 0, preAllKey = '') => {
+  for (let i = 0; i < list.length; i++) {
+    list[i].level = level
+    list[i].allKey = (!preAllKey) 
+      ? list[i].key
+      : `${preAllKey}-${list[i].key}`
+
+    checkLocal(list[i])
+    if (list[i].children?.length > 0) {
+      handleMenuList(list[i].children, level + 1, list[i].allKey)
+    }
+  }
+  return list
+}
+drinkMenuList = handleMenuList(drinkMenuCopy)
 </script>
 
 <template>
@@ -73,7 +95,7 @@ const hasSameClicked = (params) => {
     :class="{ 'translate-x-full': !isSideBarOpen }"
   >
     <DropdownMenu 
-      :drinkMenu="handleMenuList(drinkMenuList)"
+      :drinkMenu="drinkMenuList"
       :searchActiveMenuList="searchActiveMenuList"
       @selectMenuItem="selectMenuItem" 
     />

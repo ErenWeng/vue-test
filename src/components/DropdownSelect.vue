@@ -13,6 +13,50 @@ const emit = defineEmits([
 const drinkFlatList = reactive({ map: new Map()})
 const selectedDrinkItem = ref('')
 
+const selectSelectItem = (localData = {}) => {
+  let params = {}
+  if (localData.allKey) {
+    const allKey = localData.allKey.split('-')
+    const lastKey = allKey[allKey.length - 1] 
+    params = {
+      key: lastKey,
+      allKey: localData.allKey,
+      text: localData.text,
+    }
+    selectedDrinkItem.value = lastKey
+  } else {
+    let itemData = drinkFlatList.map.get(selectedDrinkItem.value)
+    params = {
+      key: selectedDrinkItem.value,
+      allKey: itemData.allKey,
+      text: itemData.text,
+    }
+  }
+  emit('selectSelectItem', params)
+}
+
+const selectedDrinkItemName = computed(() => {
+  let data = drinkFlatList.map.get(selectedDrinkItem.value)
+  return data?.text || ''
+})
+
+const clearLocalStorage = () => {
+  localStorage.clear()
+  alert('localStorage 已清空')
+}
+
+const checkLocalByMap = (params) => {
+  const localKey = localStorage.getItem("selectedMenuKey");
+  if (!localKey) return
+  const localData = drinkFlatList.map.get(params.key)
+  const allKey = localData.allKey.split('-')
+  const lastKey = allKey[allKey.length - 1] 
+  if (lastKey === localKey) {
+    selectSelectItem(localData)
+  }
+}
+
+// 對 Menu 資料做初始處理、製作 Map
 const handleSelectList = (list, name = '', preAllKey = '') => {
   for (let i = 0; i < list.length; i++) {
     const { key, text } = list[i]
@@ -26,27 +70,13 @@ const handleSelectList = (list, name = '', preAllKey = '') => {
     }
 
     drinkFlatList.map.set(key, { text, name: longName, allKey })
+    checkLocalByMap(list[i])
     if (list[i].children?.length > 0) {
       handleSelectList(list[i].children, longName, allKey)
     }
   }
 }
 handleSelectList(drinkMenu)
-
-const selectSelectItem = () => {
-  let itemData = drinkFlatList.map.get(selectedDrinkItem.value)
-  let params = {
-    key: selectedDrinkItem.value,
-    allKey: itemData.allKey,
-    text: itemData.text,
-  }
-  emit('selectSelectItem', params)
-}
-
-const selectedDrinkItemName = computed(() => {
-  let data = drinkFlatList.map.get(selectedDrinkItem.value)
-  return data?.text || ''
-})
 </script>
 
 <template>
@@ -68,4 +98,5 @@ const selectedDrinkItemName = computed(() => {
       </option>
     </select>
   </div>
+  <button class="min-h-15 border-[1px] px-2 ml-2 mt-4 m-auto" @click="clearLocalStorage">clear localStorage</button>
 </template>
