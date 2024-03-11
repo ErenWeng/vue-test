@@ -91,7 +91,7 @@ drinkMenuList = handleMenuList(drinkMenuCopy)
   >
   </div>
   <div 
-    class="w-1/2 h-screen absolute z-[100] inset-y-0 right-0 m-auto pl-1 py-2 overflow-y-scroll bg-black bg-opacity-90 text-white transition ease-in-out duration-300"
+    class="w-1/2 h-screen absolute z-[100] inset-y-0 right-0 m-auto pl-1 py-2 overflow-y-scroll overflow-x-hidden bg-black bg-opacity-90 text-white transition ease-in-out duration-300"
     :class="{ 'translate-x-full': !isSideBarOpen }"
   >
     <DropdownMenu 

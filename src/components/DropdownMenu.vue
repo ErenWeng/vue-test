@@ -31,16 +31,25 @@ const isMenuListActive = (key) => {
       >
         {{ menu.text }}
       </div>
-      <div 
-        v-show="menu.children && isMenuListActive(menu.key)" 
-        class="pl-4"
+      <transition
+        enter-active-class="duration-500 ease-out"
+        enter-from-class="transform opacity-0 translate-x-6"
+        enter-to-class="opacity-100"
+        leave-active-class="duration-0"
+        leave-from-class="opacity-100"
+        leave-to-class="transform opacity-0 -translate-x-6"
       >
-        <DropdownMenu 
-          :drinkMenu="menu.children"
-          :searchActiveMenuList="searchActiveMenuList"
-          @selectMenuItem="selectMenuItem"
-        />
-      </div>
+        <div 
+          v-show="menu.children && isMenuListActive(menu.key)" 
+          class="pl-4"
+        >
+          <DropdownMenu 
+            :drinkMenu="menu.children"
+            :searchActiveMenuList="searchActiveMenuList"
+            @selectMenuItem="selectMenuItem"
+          />
+        </div>
+      </transition>
     </li>
   </ul>
 </template>
