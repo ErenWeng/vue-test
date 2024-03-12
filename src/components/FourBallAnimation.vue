@@ -26,12 +26,12 @@ const back = () => {
 }
 
 const ballPosition = (ball) => {
-  return [`top-[${ball.top}px]`, `left-[${ball.left}px]`]
+  return [`top: ${ball.top}px`, `left: ${ball.left}px`]
 }
 </script>
 
 <template>
-  <div class="fixed inset-0 h-screen w-screen m-auto pointer-events-none">
+  <div class="absolute inset-0 h-screen w-screen m-auto pointer-events-none">
     <span>四顆球移動</span>
     <button class="border-[1px] border-black px-1 m-1 pointer-events-auto" @click="move">move</button>
     <button class="border-[1px] border-black px-1 m-1 pointer-events-auto" @click="back">back</button>
@@ -39,7 +39,7 @@ const ballPosition = (ball) => {
       ref="ballRef" 
       v-for="ball in ballList" 
       :key="ball.id"
-      :class="ballPosition(ball)"
+      :style="ballPosition(ball)"
       class="absolute m-auto transition-all ease-in-out duration-300"
     />
   </div>

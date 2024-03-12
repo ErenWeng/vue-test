@@ -32,12 +32,12 @@ const isMenuListActive = (key) => {
         {{ menu.text }}
       </div>
       <transition
-        enter-active-class="duration-500 ease-out"
+        enter-active-class="duration-500 delay-200 ease-out"
         enter-from-class="transform opacity-0 translate-x-6"
         enter-to-class="opacity-100"
-        leave-active-class="duration-0"
+        leave-active-class="duration-200 ease-in"
         leave-from-class="opacity-100"
-        leave-to-class="transform opacity-0 -translate-x-6"
+        leave-to-class="transform opacity-0 translate-x-6"
       >
         <div 
           v-show="menu.children && isMenuListActive(menu.key)" 
